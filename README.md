@@ -8,7 +8,36 @@ with automated 180% pricing, and an upward commission payout engine.
 - Backend: FastAPI + SQLAlchemy 2.0 (async) + PostgreSQL 16 (LTREE) + Alembic + Argon2id + JWT.
 - Frontend: React + TypeScript + Vite, in `frontend/`.
 
-## Backend setup
+## Running everything with Docker (recommended)
+
+The whole stack — Postgres, Redis, the FastAPI backend, and the Vite frontend dev
+server — is defined in `docker-compose.yml`.
+
+```
+docker compose up -d --build
+```
+
+- API: `http://localhost:8000` (docs at `/docs`); migrations run automatically on
+  container start.
+- Frontend: `http://localhost:5173`, running Vite's dev server with hot reload —
+  the `frontend/` folder is bind-mounted into the container, so edits on your
+  machine reload in the browser without rebuilding the image.
+- Postgres is published on host port `5433` (to avoid clashing with any local
+  Postgres install on the default `5432`); Redis on `6379`.
+
+`docker compose down` stops everything (add `-v` to also wipe the database volume).
+`docker compose logs -f api` / `frontend` tail a service's logs.
+
+Pages: home, login/register (invite-only — register with no referral code once to
+create the Layer 0 root, then every subsequent registration needs a referral
+code), dashboard (profile, referral code, invite link), Tours & Travel Packages
+and Vendor's Product catalogs (the two nav-bar sections from FR-2.1), a vendor
+product-listing form, and an orders page that walks an order through
+confirm-payment → process-payout.
+
+## Running without Docker
+
+**Backend:**
 
 1. Create a PostgreSQL 16 database (LTREE and uuid-ossp extensions are created by
    the first migration automatically — the DB role just needs `CREATE EXTENSION`
@@ -31,7 +60,7 @@ python -m venv .venv
 Docs at `http://localhost:8000/docs`. CORS is preconfigured for `http://localhost:5173`
 (the Vite dev server).
 
-## Frontend setup
+**Frontend:**
 
 ```
 cd frontend
@@ -40,12 +69,7 @@ cp .env.example .env   # VITE_API_BASE_URL, defaults to http://localhost:8000
 npm run dev
 ```
 
-App at `http://localhost:5173`. Pages: home, login/register (invite-only —
-register with no referral code once to create the Layer 0 root, then every
-subsequent registration needs a referral code), dashboard (profile, referral
-code, invite link), Tours & Travel Packages and Vendor's Product catalogs (the
-two nav-bar sections from FR-2.1), a vendor product-listing form, and an
-orders page that walks an order through confirm-payment → process-payout.
+App at `http://localhost:5173`.
 
 ## Key flows
 

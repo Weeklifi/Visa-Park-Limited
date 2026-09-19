@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: visapark
+      POSTGRES_PASSWORD: visapark
+      POSTGRES_DB: visapark
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U visapark"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://visapark:visapark@postgres:5432/visapark
+      REDIS_URL: redis://redis:6379/0
+      JWT_ALGORITHM: HS256
+      JWT_PRIVATE_KEY: dev-only-secret-change-me
+      JWT_PUBLIC_KEY: dev-only-secret-change-me
+      ACCESS_TOKEN_EXPIRE_MINUTES: "15"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      # Browser-facing URL: fetch calls run in the user's browser, not inside the
+      # container, so this must be the host-published API port, not a service name.
+      VITE_API_BASE_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+
+volumes:
+  pgdata:
