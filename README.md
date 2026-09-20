@@ -28,6 +28,12 @@ docker compose up -d --build
 `docker compose down` stops everything (add `-v` to also wipe the database volume).
 `docker compose logs -f api` / `frontend` tail a service's logs.
 
+Note: `depends_on` only orders startup for `docker compose up`. When the Docker daemon
+itself restarts (reboot, Docker Desktop relaunch) it ignores `depends_on` and starts
+containers in arbitrary order, so the API can come up before Postgres' DNS is ready.
+`scripts/wait_for_db.py` runs first in the API's command to wait that out instead of
+crash-looping on `Temporary failure in name resolution`.
+
 Pages: home, login/register (invite-only — register with no referral code once to
 create the Layer 0 root, then every subsequent registration needs a referral
 code), dashboard (profile, referral code, invite link), Tours & Travel Packages

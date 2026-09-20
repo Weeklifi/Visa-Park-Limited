@@ -1,8 +1,15 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env" if os.getenv("APP_ENV") != "docker" else None,
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+    )
 
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/visapark"
     redis_url: str = "redis://localhost:6379/0"
