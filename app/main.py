@@ -10,7 +10,7 @@ app = FastAPI(title="Multi-Tier Pyramid Marketplace Engine", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://187.77.132.222:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
