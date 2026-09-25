@@ -5,6 +5,8 @@ export interface RegisterPayload {
   full_name: string;
   email: string;
   password: string;
+  phone_number?: string;
+  nid?: string;
   parent_referral_code?: string;
 }
 
@@ -12,6 +14,8 @@ export interface RegisterResponse {
   id: string;
   full_name: string;
   email: string;
+  phone_number?: string;
+  nid?: string;
   referral_code: string;
   layer_level: number;
   node_path: string;

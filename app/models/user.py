@@ -29,6 +29,9 @@ class User(Base):
     node_path: Mapped[str] = mapped_column(LtreeType, nullable=False)
     child_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
+    phone_number: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
+    nid: Mapped[str | None] = mapped_column(String(30), unique=True, nullable=True, index=True)
+
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

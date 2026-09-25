@@ -20,6 +20,7 @@ export default function NavBar() {
         <Link to="/vendor-products">Vendor's Product</Link>
         {user && <Link to="/orders">My Orders</Link>}
         {user && <Link to="/dashboard">Dashboard</Link>}
+        {user && <Link to="/team">My Team</Link>}
       </div>
       <div className="navbar-auth">
         {user ? (

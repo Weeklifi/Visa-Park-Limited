@@ -16,10 +16,14 @@ router = APIRouter(prefix="/auth", tags=["Auth & Registration"])
 async def register(payload: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
     try:
         if payload.parent_referral_code is None:
-            user = await register_root_user(db, payload.full_name, payload.email, payload.password)
+            user = await register_root_user(
+                db, payload.full_name, payload.email, payload.password,
+                payload.phone_number, payload.nid
+            )
         else:
             user = await register_user_with_referral(
-                db, payload.full_name, payload.email, payload.password, payload.parent_referral_code
+                db, payload.full_name, payload.email, payload.password,
+                payload.parent_referral_code, payload.phone_number, payload.nid
             )
         await db.commit()
     except RegistrationError as exc:
@@ -27,7 +31,10 @@ async def register(payload: UserRegisterRequest, db: AsyncSession = Depends(get_
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
     except IntegrityError as exc:
         await db.rollback()
-        raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered") from exc
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Email, phone number, or NID already registered"
+        ) from exc
 
     return user
 

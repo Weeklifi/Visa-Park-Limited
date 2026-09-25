@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProductListPage from "./pages/ProductListPage";
 import CreateVendorProductPage from "./pages/CreateVendorProductPage";
 import OrdersPage from "./pages/OrdersPage";
+import TeamReportPage from "./pages/TeamReportPage";
 
 export default function App() {
   return (
@@ -46,6 +47,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <OrdersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                <ProtectedRoute>
+                  <TeamReportPage />
                 </ProtectedRoute>
               }
             />

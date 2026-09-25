@@ -2,6 +2,8 @@ export interface UserProfile {
   id: string;
   full_name: string;
   email: string;
+  phone_number?: string | null;
+  nid?: string | null;
   referral_code: string;
   layer_level: number;
   node_path: string;
@@ -45,4 +47,30 @@ export interface CommissionPayoutResult {
   per_ancestor_payout: string;
   root_remainder_credit: string;
   status: string;
+}
+
+export interface DirectReport {
+  id: string;
+  full_name: string;
+  phone_number?: string | null;
+  nid?: string | null;
+  email: string;
+  referral_code: string;
+  layer_level: number;
+  child_count: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface NetworkMember {
+  id: string;
+  full_name: string;
+  phone_number?: string | null;
+  layer_level: number;
+}
+
+export interface TeamReport {
+  direct_reports: DirectReport[];
+  network: NetworkMember[];
+  total_team_size: number;
 }

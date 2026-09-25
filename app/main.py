@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.orders import router as order_router
 from app.api.products import router as product_router
+from app.api.reports import router as report_router
 from app.api.users import router as user_router
 
 app = FastAPI(title="Multi-Tier Pyramid Marketplace Engine", version="1.0.0")
@@ -20,6 +21,7 @@ app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(product_router)
 app.include_router(order_router)
+app.include_router(report_router)
 
 
 @app.get("/health", tags=["System"])

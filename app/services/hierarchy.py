@@ -24,7 +24,10 @@ async def _total_user_count(db: AsyncSession) -> int:
     return result.scalar_one()
 
 
-async def register_root_user(db: AsyncSession, full_name: str, email: str, password: str) -> User:
+async def register_root_user(
+    db: AsyncSession, full_name: str, email: str, password: str,
+    phone_number: str | None = None, nid: str | None = None
+) -> User:
     """Registers the single Layer 0 root. Fails if a root already exists."""
     existing_root = await db.execute(select(User).where(User.layer_level == 0))
     if existing_root.scalar_one_or_none() is not None:
@@ -40,6 +43,8 @@ async def register_root_user(db: AsyncSession, full_name: str, email: str, passw
         full_name=full_name,
         email=email,
         hashed_password=hash_password(password),
+        phone_number=phone_number,
+        nid=nid,
         referral_code=referral_code,
         layer_level=0,
         parent_id=None,
@@ -52,13 +57,17 @@ async def register_root_user(db: AsyncSession, full_name: str, email: str, passw
 
 
 async def register_user_with_referral(
-    db: AsyncSession, full_name: str, email: str, password: str, parent_referral_code: str
+    db: AsyncSession, full_name: str, email: str, password: str, parent_referral_code: str,
+    phone_number: str | None = None, nid: str | None = None
 ) -> User:
     """Registers a Layer k>=1 user under the parent identified by parent_referral_code.
 
     Locks the parent row FOR UPDATE to serialize concurrent child_count increments
     and re-checks the global capacity + child-count invariants inside that lock.
     """
+    if not phone_number or not nid:
+        raise RegistrationError("Phone number and NID are required for non-root users.")
+
     total = await _total_user_count(db)
     if total >= settings.max_total_users:
         raise RegistrationError("Platform has reached its 11,111 user capacity.")
@@ -87,6 +96,8 @@ async def register_user_with_referral(
         full_name=full_name,
         email=email,
         hashed_password=hash_password(password),
+        phone_number=phone_number,
+        nid=nid,
         referral_code=referral_code,
         layer_level=new_layer,
         parent_id=parent.id,
@@ -117,3 +128,27 @@ async def get_direct_ancestors(db: AsyncSession, user: User) -> list[User]:
         .order_by(User.layer_level.desc())
     )
     return list(result.scalars().all())
+
+
+async def get_team_report(db: AsyncSession, user: User) -> tuple[list[User], list[User]]:
+    """Returns (direct_children, deeper_descendants) for `user`.
+
+    Uses LTREE `<@` operator (descendant-of) to find all descendants in one indexed query,
+    then partitions them into immediate children (parent_id == user.id) and deeper descendants.
+    """
+    if user.layer_level >= settings.max_layer:
+        return [], []
+
+    # `<@` is the LTREE "is descendant of or equal" operator. Exclude self.
+    result = await db.execute(
+        select(User)
+        .where(User.node_path.op("<@")(user.node_path))
+        .where(User.id != user.id)
+        .order_by(User.layer_level, User.full_name)
+    )
+    all_descendants = list(result.scalars().all())
+
+    direct_children = [d for d in all_descendants if d.parent_id == user.id]
+    deeper_descendants = [d for d in all_descendants if d.parent_id != user.id]
+
+    return direct_children, deeper_descendants
