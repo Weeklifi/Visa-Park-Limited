@@ -40,7 +40,7 @@ export default function RegisterPage() {
         parent_referral_code: referralCode.trim() || undefined,
       });
       setSuccess(
-        `Account created at Layer ${result.layer_level}. Your referral code is ${result.referral_code} — share it to invite others.`
+        `Account created at Layer ${result.layer_level}. Your Member ID is ${result.member_id}. Your referral code is ${result.referral_code} — share it to invite others.`
       );
       setTimeout(() => navigate("/login"), 2500);
     } catch (err) {

@@ -1,5 +1,6 @@
 export interface UserProfile {
   id: string;
+  member_id: string;
   full_name: string;
   email: string;
   phone_number?: string | null;
@@ -51,6 +52,7 @@ export interface CommissionPayoutResult {
 
 export interface DirectReport {
   id: string;
+  member_id: string;
   full_name: string;
   phone_number?: string | null;
   nid?: string | null;

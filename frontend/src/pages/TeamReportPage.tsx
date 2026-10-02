@@ -52,6 +52,7 @@ export default function TeamReportPage() {
               <table className="team-table">
                 <thead>
                   <tr>
+                    <th>Member ID</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>NID</th>
@@ -66,6 +67,9 @@ export default function TeamReportPage() {
                 <tbody>
                   {report.direct_reports.map((member) => (
                     <tr key={member.id}>
+                      <td>
+                        <code>{member.member_id}</code>
+                      </td>
                       <td>{member.full_name}</td>
                       <td>{member.phone_number || "—"}</td>
                       <td>{member.nid || "—"}</td>

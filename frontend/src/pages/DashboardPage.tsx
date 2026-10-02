@@ -22,6 +22,10 @@ export default function DashboardPage() {
       <div className="card">
         <h2>Profile</h2>
         <dl className="profile-grid">
+          <dt>Member ID</dt>
+          <dd>
+            <code>{user.member_id}</code>
+          </dd>
           <dt>Name</dt>
           <dd>{user.full_name}</dd>
           <dt>Email</dt>

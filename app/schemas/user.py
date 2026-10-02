@@ -18,6 +18,7 @@ class UserRegisterRequest(BaseModel):
 
 class UserRegisterResponse(BaseModel):
     id: UUID
+    member_id: str
     full_name: str
     email: str
     phone_number: Optional[str] = None
@@ -41,6 +42,7 @@ class TokenResponse(BaseModel):
 
 class UserProfileResponse(BaseModel):
     id: UUID
+    member_id: str
     full_name: str
     email: str
     phone_number: Optional[str] = None
@@ -56,6 +58,7 @@ class UserProfileResponse(BaseModel):
 
 class DirectReportOut(BaseModel):
     id: UUID
+    member_id: str
     full_name: str
     phone_number: Optional[str] = None
     nid: Optional[str] = None

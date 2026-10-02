@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.security import hash_password
 from app.models.user import User
+from app.services.member_id import generate_member_id
 
 
 class RegistrationError(Exception):
@@ -40,6 +41,7 @@ async def register_root_user(
     referral_code = _generate_referral_code()
     root = User(
         id=uuid.uuid4(),
+        member_id=await generate_member_id(db),
         full_name=full_name,
         email=email,
         hashed_password=hash_password(password),
@@ -93,6 +95,7 @@ async def register_user_with_referral(
     referral_code = _generate_referral_code()
     user = User(
         id=uuid.uuid4(),
+        member_id=await generate_member_id(db),
         full_name=full_name,
         email=email,
         hashed_password=hash_password(password),
